@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Polengo Crasher</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0f0f0f;color:#ddd;font-family:monospace;padding:30px;font-size:14px}
+h1{color:#ff4444;margin-bottom:4px}
+p{color:#444;font-size:12px;margin-bottom:24px}
+#wrap{display:flex;gap:40px}
+#left,#right{flex:1}
+h3{color:#555;font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+input{width:100%;background:#1a1a1a;border:1px solid #2a2a2a;color:#ddd;padding:8px 10px;font-family:monospace;font-size:13px;outline:none;border-radius:3px;margin-bottom:8px}
+button{width:100%;background:#1a1a1a;border:1px solid #2a2a2a;color:#ddd;padding:8px;font-family:monospace;font-size:13px;cursor:pointer;border-radius:3px}
+button:hover{background:#222}
+#cbtn{background:#1a0000;border-color:#3a0000;color:#ff4444}
+#cbtn:hover{background:#200000}
+#stats{display:flex;gap:16px;margin-bottom:28px}
+.s{background:#111;border:1px solid #1e1e1e;border-radius:3px;padding:12px 20px;text-align:center;flex:1}
+.sn{font-size:24px;color:#ff4444}
+.sl{font-size:10px;color:#444;margin-top:2px}
+#bg{background:#1a1a1a;height:5px;border-radius:2px;overflow:hidden;margin:10px 0;display:none}
+#bar{height:100%;width:0;background:#ff4444;transition:width .08s}
+#log{font-size:12px;color:#444;line-height:2}
+.ok{color:#44cc77}.e{color:#ff4444}.w{color:#ffaa00}
+</style>
+</head>
+<body>
+<h1>Polengo Crasher</h1>
+<p> O melhor que tem</p>
+
+<div id="stats">
+  <div class="s"><div class="sn" id="nc">0</div><div class="sl">derrubados</div></div>
+  <div class="s"><div class="sn" id="np">0</div><div class="sl">players kickados</div></div>
+  <div class="s"><div class="sn" id="ns">0</div><div class="sl">servidores offline</div></div>
+</div>
+
+  <div id="right">
+    <h3>Pesquisar Jogo</h3>
+    <input id="si" placeholder="nome do jogo...">
+    <button onclick="window.open('https://discord.com/app','_blank')">🔍 Pesquisar</button>
+  </div>
+</div>
+
+<script>
+let busy=false;
+const log=document.getElementById('log');
+function ln(t,c){const d=document.createElement('div');d.className=c||'';d.textContent=t;log.appendChild(d);}
+function crash(){
+  if(busy||!document.getElementById('gi').value.trim())return;
+  const g=document.getElementById('gi').value.trim();
+  busy=true;document.getElementById('cbtn').disabled=true;
+  log.innerHTML='';document.getElementById('bg').style.display='block';
+  const bar=document.getElementById('bar');
+  const steps=[[5,'> conectando ao servidor de '+g,'w'],[30,'> escaneando vulnerabilidades...',''],
+    [55,'> vulnerabilidade encontrada!','ok'],[75,'> injetando payload...','w'],
+    [90,'> derrubando instâncias...','e'],[100,'> servidor offline 💥','e']];
+  let p=0,si=0;
+  const iv=setInterval(()=>{
+    p=Math.min(100,p+1.5);bar.style.width=p+'%';
+    while(si<steps.length&&p>=steps[si][0])ln(steps[si][1],steps[si][2]),si++;
+    if(p>=100){
+      clearInterval(iv);
+      document.getElementById('nc').textContent=+document.getElementById('nc').textContent+1;
+      document.getElementById('np').textContent=(+document.getElementById('np').textContent.replace(/\D/g,'')+Math.floor(Math.random()*50000+5000)).toLocaleString('pt-BR');
+      document.getElementById('ns').textContent=+document.getElementById('ns').textContent+Math.floor(Math.random()*20+5);
+      busy=false;document.getElementById('cbtn').disabled=false;
+    }
+  },40);
+}
+</script>
+</body>
+</html>
