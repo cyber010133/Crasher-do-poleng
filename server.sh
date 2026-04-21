@@ -26,7 +26,16 @@ echo -e "${G} Local : http://localhost:$PORT${N}"
 echo -e "${G} Rede  : http://$IP:$PORT${N}"
 echo -e "${C}━━━━━━━━━━━━━━━━━━━━━━━━${N}"
 
-command -v termux-open-url &>/dev/null && sleep 1 && termux-open-url "http://localhost:$PORT" &
-command -v xdg-open &>/dev/null && sleep 1 && xdg-open "http://localhost:$PORT" &>/dev/null &
+# Inicia servidor em background e espera subir
+cd "$DIR" && python3 -m http.server $PORT &
+SERVER_PID=$!
+sleep 2
 
-cd "$DIR" && python3 -m http.server $PORT,
+# Abre com http:// forçado
+if command -v termux-open-url &>/dev/null; then
+    termux-open-url "http://localhost:$PORT"
+elif command -v xdg-open &>/dev/null; then
+    xdg-open "http://localhost:$PORT" &>/dev/null &
+fi
+
+wait $SERVER_PID
