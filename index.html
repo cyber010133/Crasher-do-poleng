@@ -24,6 +24,15 @@ button:hover{background:#222}
 #bar{height:100%;width:0;background:#ff4444;transition:width .08s}
 #log{font-size:12px;color:#444;line-height:2}
 .ok{color:#44cc77}.e{color:#ff4444}.w{color:#ffaa00}
+#modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);align-items:center;justify-content:center}
+#modal.show{display:flex}
+#mbox{background:#111;border:1px solid #2a2a2a;border-radius:4px;padding:28px;width:340px;text-align:center}
+#mbox h2{color:#ddd;margin-bottom:6px;font-size:16px}
+#mbox p{color:#555;font-size:12px;margin-bottom:20px}
+#mbox input{text-align:center;letter-spacing:6px;font-size:18px}
+#mbox button{background:#1a2a1a;border-color:#2a4a2a;color:#44cc77}
+#mbox button:hover{background:#1e331e}
+#err{color:#ff4444;font-size:12px;height:16px;margin-bottom:10px}
 </style>
 </head>
 <body>
@@ -36,39 +45,42 @@ button:hover{background:#222}
   <div class="s"><div class="sn" id="ns">0</div><div class="sl">servidores offline</div></div>
 </div>
 
-  <div id="right">
-    <h3>Pesquisar Jogo</h3>
-    <input id="si" placeholder="nome do jogo...">
-    <button onclick="window.open('https://discord.com/app','_blank')">🔍 Pesquisar</button>
+<div id="right">
+  <h3>Pesquisar Jogo</h3>
+  <input id="si" placeholder="nome do jogo...">
+  <button onclick="openModal()">🔍 Pesquisar</button>
+</div>
+
+<div id="modal">
+  <div id="mbox">
+    <h2>Verificação</h2>
+    <p>Digite o código para continuar</p>
+    <p id="code-display" style="font-size:22px;color:#fff;letter-spacing:6px;margin-bottom:16px;font-weight:bold"></p>
+    <input id="code-input" placeholder="_ _ _ _ _ _" maxlength="6" autocomplete="off">
+    <div id="err"></div>
+    <button onclick="verify()">Confirmar</button>
   </div>
 </div>
 
 <script>
-let busy=false;
-const log=document.getElementById('log');
-function ln(t,c){const d=document.createElement('div');d.className=c||'';d.textContent=t;log.appendChild(d);}
-function crash(){
-  if(busy||!document.getElementById('gi').value.trim())return;
-  const g=document.getElementById('gi').value.trim();
-  busy=true;document.getElementById('cbtn').disabled=true;
-  log.innerHTML='';document.getElementById('bg').style.display='block';
-  const bar=document.getElementById('bar');
-  const steps=[[5,'> conectando ao servidor de '+g,'w'],[30,'> escaneando vulnerabilidades...',''],
-    [55,'> vulnerabilidade encontrada!','ok'],[75,'> injetando payload...','w'],
-    [90,'> derrubando instâncias...','e'],[100,'> servidor offline 💥','e']];
-  let p=0,si=0;
-  const iv=setInterval(()=>{
-    p=Math.min(100,p+1.5);bar.style.width=p+'%';
-    while(si<steps.length&&p>=steps[si][0])ln(steps[si][1],steps[si][2]),si++;
-    if(p>=100){
-      clearInterval(iv);
-      document.getElementById('nc').textContent=+document.getElementById('nc').textContent+1;
-      document.getElementById('np').textContent=(+document.getElementById('np').textContent.replace(/\D/g,'')+Math.floor(Math.random()*50000+5000)).toLocaleString('pt-BR');
-      document.getElementById('ns').textContent=+document.getElementById('ns').textContent+Math.floor(Math.random()*20+5);
-      busy=false;document.getElementById('cbtn').disabled=false;
-    }
-  },40);
+let code='';
+function openModal(){
+  if(!document.getElementById('si').value.trim())return;
+  code=Math.floor(100000+Math.random()*900000).toString();
+  document.getElementById('code-display').textContent=code;
+  document.getElementById('code-input').value='';
+  document.getElementById('err').textContent='';
+  document.getElementById('modal').classList.add('show');
 }
+function verify(){
+  if(document.getElementById('code-input').value===code){
+    document.getElementById('modal').classList.remove('show');
+    window.open('https://discord.com/app','_blank');
+  }else{
+    document.getElementById('err').textContent='código incorreto, tente novamente';
+  }
+}
+document.getElementById('code-input').addEventListener('keydown',e=>{if(e.key==='Enter')verify();});
 </script>
 </body>
 </html>
